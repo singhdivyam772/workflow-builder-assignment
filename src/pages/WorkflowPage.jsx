@@ -363,9 +363,29 @@ export default function WorkflowPage() {
   };
 
   const handleDeleteTask = (taskId) => {
-    const newTasks = tasks.filter((task) => task.id !== taskId);
-    setTasks(newTasks);
-    localStorage.setItem("tasks", JSON.stringify(newTasks));
+    Modal.confirm({
+      title: "Are you sure you want to delete this task?",
+      content: "This action cannot be undone.",
+      onOk: () => {
+        const newTasks = tasks.filter((task) => task.id !== taskId);
+        setTasks(newTasks);
+        localStorage.setItem("tasks", JSON.stringify(newTasks));
+        notification.success({
+          message: "Task Deleted",
+          description: `Task ${taskId} has been deleted successfully.`,
+          placement: "top",
+        });
+      },
+      onCancel: () => {
+        notification.info({
+          message: "Task Deletion Canceled",
+          description: `Task ${taskId} was not deleted.`,
+          placement: "top",
+        });
+      },
+      okText: "Yes, Delete",
+      cancelText: "No, Keep",
+    });
   };
 
   return (
@@ -399,7 +419,6 @@ export default function WorkflowPage() {
                       onClick={() => handleTaskClick(task.id)}
                       className="my-2"
                       style={{
-                        marginRight: "10px",
                         backgroundColor:
                           selectedTaskButton === task.id ? "green" : "",
                         color: selectedTaskButton === task.id ? "white" : "",
@@ -407,6 +426,7 @@ export default function WorkflowPage() {
                     >
                       Task {task.id}
                     </Button>
+
                     <DeleteOutlined
                       className="text-red-500"
                       onClick={() => handleDeleteTask(task.id)}
